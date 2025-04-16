@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon"/media/root/icon.png"/>
+
+  <title>HLock v0.1 - Text Encoder</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      direction: rtl;
+      background: linear-gradient(to left, #f7f7f7, #e4e4e4);
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #1a1a1a;
+      margin-bottom: 30px;
+    }
+    textarea, select, button {
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+    textarea {
+      resize: vertical;
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: 500;
+    }
+    .highlight {
+      font-weight: bold;
+      color: #d60000;
+    }
+    .output {
+      background: #ffffff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      min-height: 100px;
+      padding: 10px;
+      white-space: pre-wrap;
+      margin-top: 15px;
+    }
+    button {
+      background-color: #0088cc;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #005f8a;
+    }
+    hr {
+      border: 0;
+      height: 1px;
+      background: #ccc;
+      margin: 20px 0;
+    }
+    .checkbox-group label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .footer {
+      font-size: 0.8em;
+      margin-top: 40px;
+      color: #555;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    footer {
+      font-size: 0.8em;
+      margin-top: 40px;
+      color: #555;
+      text-align: center;
+      line-height: 1.6;
+      
+      }
+
+    footer a{
+      color: rgb(255, 0, 0);
+      transition: 0.2s;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔐 HLock v0.1 | نظام تشفير وفك تشفير نصوص</h1>
+
+    <label for="inputText">النص الأصلي / Original Text:</label>
+    <textarea id="inputText" rows="5"></textarea>
+
+    <label class="highlight"><input type="checkbox" value="hamza" class="method" id="defaultHamza"> HLock v0.1 (مستحسنه)</label>
+    <hr>
+
+    <label>طرق تشفير أخرى / Other Encoding Methods:</label>
+    <div class="checkbox-group">
+      <label><input type="checkbox" value="caesar" class="method"> شيفرة قيصر (Caesar Cipher)</label>
+      <label><input type="checkbox" value="reverse" class="method"> عكس النص (Reverse Text)</label>
+      <label><input type="checkbox" value="base64" class="method"> ترميز Base64</label>
+      <label><input type="checkbox" value="morse" class="method"> شفرة مورس (Morse Code)</label>
+      <label><input type="checkbox" value="rot13" class="method"> ROT13</label>
+    </div>
+
+    <button onclick="encode()">🔐 تشفير النص | Encode</button>
+    <button onclick="decode()">🔓 فك التشفير | Decode</button>
+
+    <label>الناتج / Output:</label>
+    <div class="output" id="output"></div>
+
+    <div class="footer">
+      <strong>📜 تراخيص المصادر:</strong><br>
+      - <strong>Caesar Cipher</strong> و<strong>ROT13</strong> هي خوارزميات قديمة جدًا تقع ضمن الملكية العامة (Public Domain).<br>
+      - <strong>Base64</strong> ليست خوارزمية تشفير بل ترميز وتُستخدم بحرية كاملة.<br>
+      - <strong>شفرة مورس</strong> أيضًا في النطاق العام، ولا تخضع لحقوق ملكية.<br>
+      - <strong>HLock v0.1</strong> هي خوارزمية تجريبية مخصصة من تطوير حمزة ✨<br>
+      يمكنك استخدام هذا المشروع بحرية لأغراض تعليمية أو شخصية.
+    </div>
+    <div>
+    
+      
+    </div>
+  </div>
+  <footer>
+        <hr>
+        <h3>All rights reserved © 2024-2025</h3>
+       <a href="https://hmzilla.github.io">Hmzill.github.io</a>
+    <p><a href="https://github.com/Hmzilla/Hmzilla.github.io/blob/main/readme.md" target="_blank">Source code on GitHub</a></p>
+    </footer>
+
+  <script>
+    const morseCodeMap = {
+      'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 'F': '..-.',
+      'G': '--.', 'H': '....', 'I': '..', 'J': '.---', 'K': '-.-', 'L': '.-..',
+      'M': '--', 'N': '-.', 'O': '---', 'P': '.--.', 'Q': '--.-', 'R': '.-.',
+      'S': '...', 'T': '-', 'U': '..-', 'V': '...-', 'W': '.--', 'X': '-..-',
+      'Y': '-.--', 'Z': '--..', ' ': '/', '0': '-----', '1': '.----',
+      '2': '..---', '3': '...--', '4': '....-', '5': '.....', '6': '-....',
+      '7': '--...', '8': '---..', '9': '----.'
+    };
+
+    function caesarCipher(str, shift = 3, decode = false) {
+      return str.replace(/[a-zA-Z]/g, c => {
+        const base = c >= 'a' ? 97 : 65;
+        let code = c.charCodeAt(0) - base;
+        code = (decode ? code - shift + 26 : code + shift) % 26;
+        return String.fromCharCode(code + base);
+      });
+    }
+
+    function reverseText(str) {
+      return str.split('').reverse().join('');
+    }
+
+    function base64Encode(str) {
+      return btoa(unescape(encodeURIComponent(str)));
+    }
+
+    function base64Decode(str) {
+      try {
+        return decodeURIComponent(escape(atob(str)));
+      } catch (e) {
+        return '⚠️ خطأ: تأكد من أن النص المُدخل مشفر بطريقة صحيحة بصيغة Base64';
+      }
+    }
+
+    function morseEncode(str) {
+      return str.toUpperCase().split('').map(c => morseCodeMap[c] || c).join(' ');
+    }
+
+    function morseDecode(str) {
+      const reversed = Object.fromEntries(Object.entries(morseCodeMap).map(([k, v]) => [v, k]));
+      return str.split(' ').map(code => reversed[code] || code).join('');
+    }
+
+    function rot13(str) {
+      return str.replace(/[a-zA-Z]/g, c => {
+        const base = c <= 'Z' ? 65 : 97;
+        return String.fromCharCode((c.charCodeAt(0) - base + 13) % 26 + base);
+      });
+    }
+
+    function hamzaCipher(text, decode = false) {
+      const key = 7;
+      if (decode) {
+        return text.split('').map((ch, i) => String.fromCharCode(ch.charCodeAt(0) - ((i % 2 === 0) ? key : -key))).join('');
+      } else {
+        return text.split('').map((ch, i) => String.fromCharCode(ch.charCodeAt(0) + ((i % 2 === 0) ? key : -key))).join('');
+      }
+    }
+
+    function encode() {
+      let text = document.getElementById('inputText').value;
+      const checked = document.querySelectorAll('.method:checked');
+      if (checked.length === 0) {
+        document.getElementById('defaultHamza').checked = true;
+      }
+      document.querySelectorAll('.method:checked').forEach(method => {
+        switch(method.value) {
+          case 'caesar': text = caesarCipher(text); break;
+          case 'reverse': text = reverseText(text); break;
+          case 'base64': text = base64Encode(text); break;
+          case 'morse': text = morseEncode(text); break;
+          case 'rot13': text = rot13(text); break;
+          case 'hamza': text = hamzaCipher(text); break;
+        }
+      });
+      document.getElementById('output').textContent = text;
+    }
+
+    function decode() {
+      let text = document.getElementById('inputText').value;
+      const checked = document.querySelectorAll('.method:checked');
+      if (checked.length === 0) {
+        document.getElementById('defaultHamza').checked = true;
+      }
+      document.querySelectorAll('.method:checked').forEach(method => {
+        switch(method.value) {
+          case 'caesar': text = caesarCipher(text, 3, true); break;
+          case 'reverse': text = reverseText(text); break;
+          case 'base64': text = base64Decode(text); break;
+          case 'morse': text = morseDecode(text); break;
+          case 'rot13': text = rot13(text); break;
+          case 'hamza': text = hamzaCipher(text, true); break;
+        }
+      });
+      document.getElementById('output').textContent = text;
+    }
+  </script>
+</body>
+</html>
